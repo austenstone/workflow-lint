@@ -14,7 +14,7 @@ jobs:
       - id: changed-files
         uses: tj-actions/changed-files@v39
         with:
-          files: .github/workflows/*.{yml,yaml}
+          files: "**/*.{yml,yaml}"
       - uses: ./
         with:
           files: ${{ steps.changed-files.outputs.all_changed_files }}
