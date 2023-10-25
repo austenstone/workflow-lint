@@ -29,7 +29,7 @@ const run = async (): Promise<void> => {
     owner: context.repo.owner,
     repo: context.repo.repo,
     name: "GitHub Actions Workflow Lint",
-    head_sha: context.sha,
+    head_sha: context.payload.pull_request?.head.sha || context.sha,
     status: 'in_progress',
   });
 

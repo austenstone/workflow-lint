@@ -31980,7 +31980,7 @@ const run = async () => {
         owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
         name: "GitHub Actions Workflow Lint",
-        head_sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
+        head_sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request?.head.sha || _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
         status: 'in_progress',
     });
     const workflowFiles = inputs.files.split(',');
