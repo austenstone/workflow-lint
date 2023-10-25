@@ -1,4 +1,4 @@
-import { getInput, setOutput, setFailed } from "@actions/core";
+import { getInput, setOutput, setFailed, startGroup, endGroup } from "@actions/core";
 import { context } from "@actions/github";
 import { NoOperationTraceWriter, parseWorkflow } from "@actions/workflow-parser";
 // import octokit
@@ -40,6 +40,9 @@ const run = async (): Promise<void> => {
     readdirSync(WORKFLOW_DIR)
       .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
       .map(name => join(WORKFLOW_DIR, name));
+  startGroup(`Linting ${workflowFiles.length} workflow files`)
+  workflowFiles.forEach(name => console.log(name));
+  endGroup()
   if (workflowFiles.length === 0) return setFailed("No workflow files found");
 
   const results = workflowFiles.map(name => {

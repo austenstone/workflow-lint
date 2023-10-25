@@ -31987,12 +31987,15 @@ const run = async () => {
         head_sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
         status: 'in_progress',
     });
-    const workflowFiles = !inputs.files ?
-        (0,fs__WEBPACK_IMPORTED_MODULE_3__.readdirSync)(WORKFLOW_DIR)
-            .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
-            .map(name => (0,path__WEBPACK_IMPORTED_MODULE_4__.join)(WORKFLOW_DIR, name))
+    const workflowFiles = inputs.files ?
+        inputs.files.split(', ')
         :
-            inputs.files.split(', ');
+            (0,fs__WEBPACK_IMPORTED_MODULE_3__.readdirSync)(WORKFLOW_DIR)
+                .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
+                .map(name => (0,path__WEBPACK_IMPORTED_MODULE_4__.join)(WORKFLOW_DIR, name));
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.startGroup)(`Linting ${workflowFiles.length} workflow files`);
+    workflowFiles.forEach(name => console.log(name));
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.endGroup)();
     if (workflowFiles.length === 0)
         return (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)("No workflow files found");
     const results = workflowFiles.map(name => {
