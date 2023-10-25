@@ -4,7 +4,6 @@ import { NoOperationTraceWriter, parseWorkflow } from "@actions/workflow-parser"
 // import octokit
 import { Octokit } from "@octokit/rest";
 import { readFileSync } from "fs";
-import { basename } from "path";
 
 interface Input {
   token: string;
@@ -34,23 +33,23 @@ const run = async (): Promise<void> => {
     status: 'in_progress',
   });
 
-  console.log('files', inputs.files);
   const workflowFiles = inputs.files.split(',');
-  const workflows = workflowFiles.map(file => {
-    return {
-      name: basename(file),
-      content: readFileSync(file, "utf8")
-    }
-  });
+  const workflows = workflowFiles.map(name => ({
+    name,
+    content: readFileSync(name, "utf8")
+  }));
   console.log(workflows);
   
-  const results = workflows.map(workflow => parseWorkflow(workflow, new NoOperationTraceWriter()));
+  const results = workflows.map(workflow => ({
+    path: workflow.name,
+    result: parseWorkflow(workflow, new NoOperationTraceWriter())
+  }));
   setOutput("results", JSON.stringify(results));
 
   const annotations = results.reduce((acc, result) => {
-    const errors = result.context.errors.getErrors();
+    const errors = result.result.context.errors.getErrors();
     const _annotations = errors.map(error => ({
-      path: inputs.files,
+      path: result.path,
       start_line: error.range?.start.line,
       end_line: error.range?.end.line,
       start_column: error.range?.start.column,

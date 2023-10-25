@@ -31957,12 +31957,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @actions/github */ "./node_modules/@actions/github/lib/github.js");
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @actions/workflow-parser */ "./node_modules/@actions/workflow-parser/dist/index.js");
-/* harmony import */ var _octokit_rest__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @octokit/rest */ "./node_modules/@octokit/rest/dist-web/index.js");
+/* harmony import */ var _octokit_rest__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @octokit/rest */ "./node_modules/@octokit/rest/dist-web/index.js");
 /* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! fs */ "fs");
 /* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! path */ "path");
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_4__);
-
 
 
 
@@ -31978,7 +31975,7 @@ function getInputs() {
 }
 const run = async () => {
     const inputs = getInputs();
-    const octokit = new _octokit_rest__WEBPACK_IMPORTED_MODULE_5__.Octokit({ auth: inputs.token });
+    const octokit = new _octokit_rest__WEBPACK_IMPORTED_MODULE_4__.Octokit({ auth: inputs.token });
     const check = await octokit.rest.checks.create({
         owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
@@ -31986,21 +31983,21 @@ const run = async () => {
         head_sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
         status: 'in_progress',
     });
-    console.log('files', inputs.files);
     const workflowFiles = inputs.files.split(',');
-    const workflows = workflowFiles.map(file => {
-        return {
-            name: (0,path__WEBPACK_IMPORTED_MODULE_4__.basename)(file),
-            content: (0,fs__WEBPACK_IMPORTED_MODULE_3__.readFileSync)(file, "utf8")
-        };
-    });
+    const workflows = workflowFiles.map(name => ({
+        name,
+        content: (0,fs__WEBPACK_IMPORTED_MODULE_3__.readFileSync)(name, "utf8")
+    }));
     console.log(workflows);
-    const results = workflows.map(workflow => (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.parseWorkflow)(workflow, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter()));
+    const results = workflows.map(workflow => ({
+        path: workflow.name,
+        result: (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.parseWorkflow)(workflow, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter())
+    }));
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("results", JSON.stringify(results));
     const annotations = results.reduce((acc, result) => {
-        const errors = result.context.errors.getErrors();
+        const errors = result.result.context.errors.getErrors();
         const _annotations = errors.map(error => ({
-            path: inputs.files,
+            path: result.path,
             start_line: error.range?.start.line,
             end_line: error.range?.end.line,
             start_column: error.range?.start.column,

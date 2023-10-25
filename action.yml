@@ -18,8 +18,8 @@ inputs:
     description: The name of the repository
     default: ${{ github.event.repository.name }}
     required: false
-  workflow_path:
-    description: The path to the workflow file
+  files:
+    description: The path/s to the workflow file/s
     required: false
 
 runs:
