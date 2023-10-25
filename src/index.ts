@@ -8,10 +8,9 @@ import { basename } from "path";
 
 interface Input {
   token: string;
-  owner?: string;
-  repo?: string;
-  pull_number?: number;
-  workflow_path?: string;
+  owner: string;
+  repo: string;
+  files: string;
 }
 
 export function getInputs(): Input {
@@ -19,75 +18,61 @@ export function getInputs(): Input {
   result.token = getInput("github-token");
   result.owner = getInput('owner');
   result.repo = getInput('repo');
-  result.pull_number = parseInt(getInput('pull_number'));
-  result.workflow_path = getInput('workflow_path');
+  result.files = getInput('files');
   return result;
 }
 
 const run = async (): Promise<void> => {
   const inputs = getInputs();
   const octokit = new Octokit({ auth: inputs.token });
+
+  const check = await octokit.rest.checks.create({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    name: "GitHub Actions Workflow Lint",
+    head_sha: context.sha,
+    status: 'in_progress',
+  });
+
+  console.log('files', inputs.files);
+  const workflowFiles = inputs.files.split(',');
+  const workflows = workflowFiles.map(file => {
+    return {
+      name: basename(file),
+      content: readFileSync(file, "utf8")
+    }
+  });
+  console.log(workflows);
   
-  if (inputs.workflow_path) {
-    const workflowContent = readFileSync(inputs.workflow_path, "utf8");
+  const results = workflows.map(workflow => parseWorkflow(workflow, new NoOperationTraceWriter()));
+  setOutput("results", JSON.stringify(results));
 
-    const result = parseWorkflow({
-      name: basename(inputs.workflow_path),
-      content: workflowContent
-    }, new NoOperationTraceWriter());
-
-    setOutput("result", JSON.stringify(result));
-
+  const annotations = results.reduce((acc, result) => {
     const errors = result.context.errors.getErrors();
-    
-    const check = await octokit.rest.checks.create({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      name: "GitHub Actions Workflow Lint",
-      head_sha: context.sha,
-      status: 'in_progress',
-    });
-    
-    const annotations = errors.map(error => {
-      return {
-        path: inputs.workflow_path,
-        start_line: error.range?.start.line,
-        end_line: error.range?.end.line,
-        start_column: error.range?.start.column,
-        end_column: error.range?.end.column,
-        annotation_level: "failure",
-        message: error.message,
-        title: error.message.split('at')[0],
-      }
-    });
+    const _annotations = errors.map(error => ({
+      path: inputs.files,
+      start_line: error.range?.start.line,
+      end_line: error.range?.end.line,
+      start_column: error.range?.start.column,
+      end_column: error.range?.end.column,
+      annotation_level: "failure",
+      message: error.message,
+      title: error.message.split('at')[0],
+    }));
+    return acc.concat(_annotations);
+  }, [] as any[]);
 
-    await octokit.rest.checks.update({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      check_run_id: check.data.id,
-      conclusion: errors.length > 0 ? "failure" : "success",
-      output: {
-        title: "GitHub Actions Workflow Lint",
-        summary: `${errors.length} errors found in ${inputs.workflow_path}`,
-        annotations: annotations
-      }
-    })
-  } else if (inputs.pull_number && inputs.owner && inputs.repo) {
-    const { data } = await octokit.pulls.listFiles({
-      owner: inputs.owner,
-      repo: inputs.repo,
-      pull_number: inputs.pull_number
-    });
-  
-    const workflowFiles = data.filter(file => file.filename.endsWith(".yml"));
-  
-    workflowFiles.map(file => {
-      return readFileSync(file.filename, "utf8");
-    });
-
-    console.log(workflowFiles);
-  } else {
-  }
+  await octokit.rest.checks.update({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    check_run_id: check.data.id,
+    conclusion: annotations.length > 0 ? "failure" : "success",
+    output: {
+      title: "GitHub Actions Workflow Lint",
+      summary: `${annotations.length} errors found in ${inputs.files}`,
+      annotations: annotations
+    }
+  });
 };
 
 run();

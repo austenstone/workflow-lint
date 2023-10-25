@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - id: changed-files
+        uses: tj-actions/changed-files@v39
+        with:
+          files: .github/workflows/*.{yml,yaml}
       - uses: ./
         with:
-          workflow_path: "__tests__/workflow-invalid.yml"
+          files: ${{ steps.changed-files.outputs.all_changed_files }}
