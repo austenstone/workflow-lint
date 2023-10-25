@@ -34,12 +34,12 @@ const run = async (): Promise<void> => {
     status: 'in_progress',
   });
 
-  const workflowFiles = !inputs.files ?
+  const workflowFiles = inputs.files ?
+    inputs.files.split(', ')
+    :
     readdirSync(WORKFLOW_DIR)
       .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
-      .map(name => join(WORKFLOW_DIR, name))
-    :
-    inputs.files.split(', ');
+      .map(name => join(WORKFLOW_DIR, name));
   if (workflowFiles.length === 0) return setFailed("No workflow files found");
 
   const results = workflowFiles.map(name => {
