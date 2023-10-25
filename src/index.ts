@@ -39,7 +39,6 @@ const run = async (): Promise<void> => {
     setOutput("result", JSON.stringify(result));
 
     const errors = result.context.errors.getErrors();
-    return;
     
     const check = await octokit.rest.checks.create({
       owner: context.repo.owner,

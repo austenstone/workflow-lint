@@ -31988,7 +31988,6 @@ const run = async () => {
         }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter());
         (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("result", JSON.stringify(result));
         const errors = result.context.errors.getErrors();
-        return;
         const check = await octokit.rest.checks.create({
             owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
             repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
