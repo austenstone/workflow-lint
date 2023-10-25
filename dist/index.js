@@ -32000,6 +32000,8 @@ const run = async () => {
                 path: inputs.workflow_path,
                 start_line: error.range?.start.line,
                 end_line: error.range?.end.line,
+                start_column: error.range?.start.column,
+                end_column: error.range?.end.column,
                 annotation_level: "failure",
                 message: error.message,
                 title: error.message.split('at')[0],
