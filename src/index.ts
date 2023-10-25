@@ -47,8 +47,6 @@ const run = async (): Promise<void> => {
       head_sha: context.sha,
       status: 'in_progress',
     });
-
-    return;
     
     const annotations = errors.map(error => {
       return {
