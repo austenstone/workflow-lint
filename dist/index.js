@@ -31988,7 +31988,6 @@ const run = async () => {
         name,
         content: (0,fs__WEBPACK_IMPORTED_MODULE_3__.readFileSync)(name, "utf8")
     }));
-    console.log(workflows);
     const results = workflows.map(workflow => ({
         path: workflow.name,
         result: (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.parseWorkflow)(workflow, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter())
@@ -32008,7 +32007,6 @@ const run = async () => {
         }));
         return acc.concat(_annotations);
     }, []);
-    console.log('annotations', annotations);
     await octokit.rest.checks.update({
         owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,

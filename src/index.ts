@@ -38,7 +38,6 @@ const run = async (): Promise<void> => {
     name,
     content: readFileSync(name, "utf8")
   }));
-  console.log(workflows);
   
   const results = workflows.map(workflow => ({
     path: workflow.name,
@@ -60,7 +59,6 @@ const run = async (): Promise<void> => {
     }));
     return acc.concat(_annotations);
   }, [] as any[]);
-  console.log('annotations', annotations);
 
   await octokit.rest.checks.update({
     owner: context.repo.owner,
