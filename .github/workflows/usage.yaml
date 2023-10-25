@@ -20,3 +20,10 @@ jobs:
       - uses: ./
         with:
           files: ${{ steps.changed-files.outputs.all_changed_files }}
+  run2:
+    permissions: write-all
+    name: Run Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./

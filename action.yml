@@ -19,7 +19,7 @@ inputs:
     default: ${{ github.event.repository.name }}
     required: false
   files:
-    description: The path/s to the workflow file/s
+    description: The path/s to the workflow file/s (comma separated)
     required: false
 
 runs:

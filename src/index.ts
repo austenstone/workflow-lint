@@ -3,7 +3,7 @@ import { context } from "@actions/github";
 import { NoOperationTraceWriter, parseWorkflow } from "@actions/workflow-parser";
 // import octokit
 import { Octokit } from "@octokit/rest";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 
 interface Input {
   token: string;
@@ -24,12 +24,26 @@ export function getInputs(): Input {
 const run = async (): Promise<void> => {
   const inputs = getInputs();
   const octokit = new Octokit({ auth: inputs.token });
-  const workflowFiles = inputs.files.split(',');
+  const check = await octokit.rest.checks.create({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    name: "GitHub Actions Workflow Lint",
+    head_sha: context.sha, // context.payload.pull_request?.head.sha || 
+    status: 'in_progress',
+  });
+
+  const workflowFiles = !inputs.files ?
+    readdirSync(".github/workflows").filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
+    :
+    inputs.files.split(',');
+  if (workflowFiles.length === 0) {
+    return setFailed("No workflow files found");
+  }
   const workflows = workflowFiles.map(name => ({
     name,
     content: readFileSync(name, "utf8")
   }));
-  
+
   const results = workflows.map(workflow => ({
     path: workflow.name,
     result: parseWorkflow(workflow, new NoOperationTraceWriter())
@@ -51,22 +65,17 @@ const run = async (): Promise<void> => {
     return acc.concat(_annotations);
   }, [] as any[]);
 
-  const conclusion = annotations.length > 0 ? 'failure' : 'success';
   await octokit.rest.checks.update({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    check_run_id: context.runId,
-    conclusion,
+    check_run_id: check.data.id,
+    conclusion: annotations.length > 0 ? 'failure' : 'success',
     output: {
       title: "GitHub Actions Workflow Lint",
       summary: `${annotations.length} errors found in ${inputs.files}`,
       annotations,
     },
   });
-
-  if (conclusion === 'failure') {
-    setFailed(`${annotations.length} errors found`);
-  }
 };
 
 run();
