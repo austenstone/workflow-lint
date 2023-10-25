@@ -39,20 +39,20 @@ const run = async (): Promise<void> => {
   if (workflowFiles.length === 0) {
     return setFailed("No workflow files found");
   }
-  const workflows = workflowFiles.map(name => ({
-    name,
-    content: readFileSync(name, "utf8")
-  }));
-
-  const results = workflows.map(workflow => ({
-    path: workflow.name,
-    result: parseWorkflow(workflow, new NoOperationTraceWriter())
-  }));
+  const results = workflowFiles.map(name => {
+    return {
+      path: name,
+      result: parseWorkflow({
+        name,
+        content: readFileSync(name, "utf8")
+      }, new NoOperationTraceWriter())
+    };
+  });
   setOutput("results", JSON.stringify(results));
 
   const annotations = results.reduce((acc, result) => {
     const errors = result.result.context.errors.getErrors();
-    const _annotations = errors.map(error => ({
+    return acc.concat(errors.map(error => ({
       path: result.path,
       start_line: error.range?.start.line,
       end_line: error.range?.end.line,
@@ -61,8 +61,7 @@ const run = async (): Promise<void> => {
       annotation_level: "failure",
       message: error.message,
       title: error.message.split('at')[0],
-    }));
-    return acc.concat(_annotations);
+    })));
   }, [] as any[]);
 
   await octokit.rest.checks.update({

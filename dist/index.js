@@ -31976,19 +31976,33 @@ function getInputs() {
 const run = async () => {
     const inputs = getInputs();
     const octokit = new _octokit_rest__WEBPACK_IMPORTED_MODULE_4__.Octokit({ auth: inputs.token });
-    const workflowFiles = inputs.files.split(',');
-    const workflows = workflowFiles.map(name => ({
-        name,
-        content: (0,fs__WEBPACK_IMPORTED_MODULE_3__.readFileSync)(name, "utf8")
-    }));
-    const results = workflows.map(workflow => ({
-        path: workflow.name,
-        result: (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.parseWorkflow)(workflow, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter())
-    }));
+    const check = await octokit.rest.checks.create({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        name: "GitHub Actions Workflow Lint",
+        head_sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
+        status: 'in_progress',
+    });
+    const workflowFiles = !inputs.files ?
+        (0,fs__WEBPACK_IMPORTED_MODULE_3__.readdirSync)(".github/workflows").filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
+        :
+            inputs.files.split(',');
+    if (workflowFiles.length === 0) {
+        return (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)("No workflow files found");
+    }
+    const results = workflowFiles.map(name => {
+        return {
+            path: name,
+            result: (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.parseWorkflow)({
+                name,
+                content: (0,fs__WEBPACK_IMPORTED_MODULE_3__.readFileSync)(name, "utf8")
+            }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_2__.NoOperationTraceWriter())
+        };
+    });
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("results", JSON.stringify(results));
     const annotations = results.reduce((acc, result) => {
         const errors = result.result.context.errors.getErrors();
-        const _annotations = errors.map(error => ({
+        return acc.concat(errors.map(error => ({
             path: result.path,
             start_line: error.range?.start.line,
             end_line: error.range?.end.line,
@@ -31997,24 +32011,19 @@ const run = async () => {
             annotation_level: "failure",
             message: error.message,
             title: error.message.split('at')[0],
-        }));
-        return acc.concat(_annotations);
+        })));
     }, []);
-    const conclusion = annotations.length > 0 ? 'failure' : 'success';
     await octokit.rest.checks.update({
         owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-        check_run_id: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.runId,
-        conclusion,
+        check_run_id: check.data.id,
+        conclusion: annotations.length > 0 ? 'failure' : 'success',
         output: {
             title: "GitHub Actions Workflow Lint",
             summary: `${annotations.length} errors found in ${inputs.files}`,
             annotations,
         },
     });
-    if (conclusion === 'failure') {
-        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`${annotations.length} errors found`);
-    }
 };
 run();
 
