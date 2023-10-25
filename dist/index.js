@@ -32008,6 +32008,7 @@ const run = async () => {
         }));
         return acc.concat(_annotations);
     }, []);
+    console.log('annotations', annotations);
     await octokit.rest.checks.update({
         owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,

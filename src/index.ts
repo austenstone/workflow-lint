@@ -60,6 +60,8 @@ const run = async (): Promise<void> => {
     }));
     return acc.concat(_annotations);
   }, [] as any[]);
+  
+  console.log('annotations', annotations);
 
   await octokit.rest.checks.update({
     owner: context.repo.owner,
