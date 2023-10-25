@@ -5,8 +5,8 @@
         "jest/globals": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:github/recommended"
+        "eslint:recommended"//,
+        // "plugin:github/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {

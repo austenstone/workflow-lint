@@ -60,7 +60,6 @@ const run = async (): Promise<void> => {
     }));
     return acc.concat(_annotations);
   }, [] as any[]);
-  
   console.log('annotations', annotations);
 
   await octokit.rest.checks.update({
@@ -71,8 +70,8 @@ const run = async (): Promise<void> => {
     output: {
       title: "GitHub Actions Workflow Lint",
       summary: `${annotations.length} errors found in ${inputs.files}`,
-      annotations: annotations
-    }
+      annotations,
+    },
   });
 };
 

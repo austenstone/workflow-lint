@@ -32017,8 +32017,8 @@ const run = async () => {
         output: {
             title: "GitHub Actions Workflow Lint",
             summary: `${annotations.length} errors found in ${inputs.files}`,
-            annotations: annotations
-        }
+            annotations,
+        },
     });
 };
 run();
