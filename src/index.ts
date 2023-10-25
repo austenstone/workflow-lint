@@ -27,14 +27,6 @@ export function getInputs(): Input {
 const run = async (): Promise<void> => {
   const inputs = getInputs();
   const octokit = new Octokit({ auth: inputs.token });
-
-  const check = await octokit.rest.checks.create({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    name: "GitHub Actions Workflow Lint",
-    head_sha: context.sha,
-    status: 'in_progress',
-  });
   
   if (inputs.workflow_path) {
     const workflowContent = readFileSync(inputs.workflow_path, "utf8");
@@ -43,9 +35,20 @@ const run = async (): Promise<void> => {
       name: basename(inputs.workflow_path),
       content: workflowContent
     }, new NoOperationTraceWriter());
+
     setOutput("result", JSON.stringify(result));
 
     const errors = result.context.errors.getErrors();
+    return;
+    
+    const check = await octokit.rest.checks.create({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      name: "GitHub Actions Workflow Lint",
+      head_sha: context.sha,
+      status: 'in_progress',
+    });
+    
     const annotations = errors.map(error => {
       return {
         path: inputs.workflow_path,
