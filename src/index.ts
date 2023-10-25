@@ -1,4 +1,4 @@
-import { getInput, setOutput } from "@actions/core";
+import { getInput, setOutput, setFailed } from "@actions/core";
 import { context } from "@actions/github";
 import { NoOperationTraceWriter, parseWorkflow } from "@actions/workflow-parser";
 // import octokit
@@ -24,15 +24,6 @@ export function getInputs(): Input {
 const run = async (): Promise<void> => {
   const inputs = getInputs();
   const octokit = new Octokit({ auth: inputs.token });
-
-  const check = await octokit.rest.checks.create({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    name: "GitHub Actions Workflow Lint",
-    head_sha: context.payload.pull_request?.head.sha || context.sha,
-    status: 'in_progress',
-  });
-
   const workflowFiles = inputs.files.split(',');
   const workflows = workflowFiles.map(name => ({
     name,
@@ -60,17 +51,22 @@ const run = async (): Promise<void> => {
     return acc.concat(_annotations);
   }, [] as any[]);
 
+  const conclusion = annotations.length > 0 ? 'failure' : 'success';
   await octokit.rest.checks.update({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    check_run_id: check.data.id,
-    conclusion: annotations.length > 0 ? "failure" : "success",
+    check_run_id: context.runId,
+    conclusion,
     output: {
       title: "GitHub Actions Workflow Lint",
       summary: `${annotations.length} errors found in ${inputs.files}`,
       annotations,
     },
   });
+
+  if (conclusion === 'failure') {
+    setFailed(`${annotations.length} errors found`);
+  }
 };
 
 run();
