@@ -4,6 +4,7 @@ import { NoOperationTraceWriter, parseWorkflow } from "@actions/workflow-parser"
 // import octokit
 import { Octokit } from "@octokit/rest";
 import { readFileSync, readdirSync } from "fs";
+import { join } from "path";
 
 interface Input {
   token: string;
@@ -11,6 +12,7 @@ interface Input {
   repo: string;
   files: string;
 }
+const WORKFLOW_DIR = ".github/workflows";
 
 export function getInputs(): Input {
   const result = {} as Input;
@@ -33,12 +35,13 @@ const run = async (): Promise<void> => {
   });
 
   const workflowFiles = !inputs.files ?
-    readdirSync(".github/workflows").filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
+    readdirSync(WORKFLOW_DIR)
+      .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
+      .map(name => join(WORKFLOW_DIR, name))
     :
     inputs.files.split(',');
-  if (workflowFiles.length === 0) {
-    return setFailed("No workflow files found");
-  }
+  if (workflowFiles.length === 0) return setFailed("No workflow files found");
+  
   const results = workflowFiles.map(name => {
     return {
       path: name,
