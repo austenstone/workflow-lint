@@ -6,6 +6,7 @@ on:
 
 jobs:
   run:
+    permissions: write-all
     name: Run Action
     runs-on: ubuntu-latest
     steps:
