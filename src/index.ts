@@ -39,9 +39,9 @@ const run = async (): Promise<void> => {
       .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
       .map(name => join(WORKFLOW_DIR, name))
     :
-    inputs.files.split(',');
+    inputs.files.split(', ');
   if (workflowFiles.length === 0) return setFailed("No workflow files found");
-  
+
   const results = workflowFiles.map(name => {
     return {
       path: name,

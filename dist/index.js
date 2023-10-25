@@ -31992,7 +31992,7 @@ const run = async () => {
             .filter(name => name.endsWith(".yml") || name.endsWith(".yaml"))
             .map(name => (0,path__WEBPACK_IMPORTED_MODULE_4__.join)(WORKFLOW_DIR, name))
         :
-            inputs.files.split(',');
+            inputs.files.split(', ');
     if (workflowFiles.length === 0)
         return (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)("No workflow files found");
     const results = workflowFiles.map(name => {
