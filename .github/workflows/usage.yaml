@@ -5,10 +5,10 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+permissions: write-all
 
 jobs:
   run:
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,9 +19,3 @@ jobs:
       - uses: ./
         with:
           files: ${{ steps.changed-files.outputs.all_changed_files }}
-  run2:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./
