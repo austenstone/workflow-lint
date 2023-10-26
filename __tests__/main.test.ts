@@ -10,7 +10,7 @@ const input: any = {
   organization: process.env.ORGANIZATION || 'octoaustenstone',
   owner: process.env.OWNER || 'austenstone',
   repo: process.env.REPO || 'workflow-lint',
-  files: process.env.WORKFLOW_PATH || '__tests__/workflow-invalid.yml',
+  files: process.env.WORKFLOW_PATH || '.github/workflows/workflow-invalid.yml',
 }
 
 test('test run', () => {
