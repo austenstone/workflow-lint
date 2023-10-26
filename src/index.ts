@@ -24,7 +24,7 @@ export function getInputs(): Input {
 const run = async (): Promise<void> => {
   const inputs = getInputs();
   const workflowFiles = inputs.files ?
-    inputs.files.split(', ')
+    inputs.files.split(/,| /)
     :
     readdirSync(WORKFLOW_DIR)
       .filter(name => name.endsWith('.yml') || name.endsWith('.yaml'))

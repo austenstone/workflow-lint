@@ -5,7 +5,7 @@ on:
     paths-ignores:
       - "**.md"
   push:
-    paths-ignore:
+    paths-ignores:
       - "**.md"
 
 jobs:
