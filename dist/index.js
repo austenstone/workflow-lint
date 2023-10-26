@@ -20409,7 +20409,7 @@ function getInputs() {
 const run = async () => {
     const inputs = getInputs();
     const workflowFiles = inputs.files ?
-        inputs.files.split(', ')
+        inputs.files.split(/,| /)
         :
             (0,fs__WEBPACK_IMPORTED_MODULE_2__.readdirSync)(WORKFLOW_DIR)
                 .filter(name => name.endsWith('.yml') || name.endsWith('.yaml'))
@@ -20440,6 +20440,7 @@ const run = async () => {
             }
         });
     });
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)('results', JSON.stringify(results));
 };
 run();
 
