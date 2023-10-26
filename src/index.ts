@@ -58,7 +58,8 @@ const run = async (): Promise<void> => {
       }
     });
   });
-  setOutput('results', JSON.stringify(results))
+  setOutput('results', JSON.stringify(results));
+  return results.length > 0 ? setFailed(`${results.length} linting problems found`) : undefined;
 };
 
 run();

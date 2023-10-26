@@ -43845,6 +43845,7 @@ const run = async () => {
         });
     });
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)('results', JSON.stringify(results));
+    return results.length > 0 ? (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`${results.length} linting problems found`) : undefined;
 };
 run();
 
