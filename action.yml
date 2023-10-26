@@ -1,23 +1,11 @@
-name: TypeScript Action
+name: Workflow Lint
 author: Austen Stone
-description: A TypeScript Action
+description: Lint workflow files
 branding:
-  icon: "plus"
-  color: "blue"
+  icon: "search"
+  color: "red"
 
 inputs:
-  github-token:
-    description: The GitHub token used to create an authenticated client
-    default: ${{ github.token }}
-    required: false
-  owner:
-    description: The owner of the repository
-    default: ${{ github.repository_owner }}
-    required: false
-  repo:
-    description: The name of the repository
-    default: ${{ github.event.repository.name }}
-    required: false
   files:
     description: The path/s to the workflow file/s (comma separated)
     required: false

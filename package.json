@@ -1,5 +1,5 @@
 {
-  "name": "action-typescript",
+  "name": "workflow-lint",
   "version": "1.0.0",
   "description": "GitHub Actions TypeScript template",
   "main": "src/index.ts",

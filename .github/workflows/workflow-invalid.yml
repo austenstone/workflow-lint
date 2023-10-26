@@ -10,7 +10,7 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latests
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v6
