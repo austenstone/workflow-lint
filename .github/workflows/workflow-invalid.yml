@@ -1,0 +1,36 @@
+name: Build / Lint / Test
+
+on:
+  pull_request:
+    paths-ignores:
+      - "**.md"
+  push:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v6
+      - run: npm install
+      - Name: Lint
+        run: npm run lint
+      - run: npm run build
+      - run: npm test
+        env:
+          - GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - test: actions/setup-node@v6
+      - run: npm install
+      - run: npm run build
+      - uses: JamesIves/github-pages-deploy-action@3.5.14
+        with:
+        branch: gh-pages
+        folder: build
