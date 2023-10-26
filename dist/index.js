@@ -20430,7 +20430,6 @@ const run = async () => {
                         endLine: err.range?.end.line,
                         startLine: err.range?.start.line,
                         file: result.context.getFileTable()[0],
-                        title: message[0],
                     });
                     results.push(result);
                 });

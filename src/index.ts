@@ -48,7 +48,6 @@ const run = async (): Promise<void> => {
               endLine: err.range?.end.line,
               startLine: err.range?.start.line,
               file: result.context.getFileTable()[0],
-              title: message[0],
             }
           )
           results.push(result);
@@ -59,7 +58,7 @@ const run = async (): Promise<void> => {
       }
     });
   });
-  // setOutput('results', JSON.stringify(results))
+  setOutput('results', JSON.stringify(results))
 };
 
 run();
