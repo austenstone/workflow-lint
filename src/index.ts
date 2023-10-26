@@ -38,20 +38,21 @@ const run = async (): Promise<void> => {
           name: fileName,
           content: readFileSync(fileName, 'utf8')
         }, new NoOperationTraceWriter());
-        result.context.errors.getErrors()?.forEach(err =>
+        result.context.errors.getErrors()?.forEach(err => {
+          const message = err.message.split(':');
           error(
-            err.message,
+            message[1],
             {
               endColumn: err.range?.end.column,
               startColumn: err.range?.start.column,
               endLine: err.range?.end.line,
               startLine: err.range?.start.line,
               file: result.context.getFileTable()[0],
-              title: err.message.split('at')[0].trim(),
+              title: message[0],
             }
           )
-        );
-        results.push(result);
+          results.push(result);
+        });
       } catch (err) {
         setFailed(`Workflow ${fileName} failed to parse: ${(err instanceof Error) ? err.message : err}`);
         return;

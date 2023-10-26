@@ -20422,15 +20422,18 @@ const run = async () => {
                     name: fileName,
                     content: (0,fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync)(fileName, 'utf8')
                 }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.NoOperationTraceWriter());
-                result.context.errors.getErrors()?.forEach(err => (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.error)(err.message, {
-                    endColumn: err.range?.end.column,
-                    startColumn: err.range?.start.column,
-                    endLine: err.range?.end.line,
-                    startLine: err.range?.start.line,
-                    file: result.context.getFileTable()[0],
-                    title: err.message.split('at')[0].trim(),
-                }));
-                results.push(result);
+                result.context.errors.getErrors()?.forEach(err => {
+                    const message = err.message.split(':');
+                    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.error)(message[1], {
+                        endColumn: err.range?.end.column,
+                        startColumn: err.range?.start.column,
+                        endLine: err.range?.end.line,
+                        startLine: err.range?.start.line,
+                        file: result.context.getFileTable()[0],
+                        title: message[0],
+                    });
+                    results.push(result);
+                });
             }
             catch (err) {
                 (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`Workflow ${fileName} failed to parse: ${(err instanceof Error) ? err.message : err}`);
