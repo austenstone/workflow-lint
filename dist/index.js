@@ -20423,7 +20423,7 @@ const run = async () => {
                     content: (0,fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync)(fileName, 'utf8')
                 }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.NoOperationTraceWriter());
                 result.context.errors.getErrors()?.forEach(err => {
-                    const message = err.message.split(':');
+                    const message = err.message.split(/\): /);
                     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.error)(message[1], {
                         endColumn: err.range?.end.column,
                         startColumn: err.range?.start.column,
@@ -20441,7 +20441,6 @@ const run = async () => {
             }
         });
     });
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)('results', JSON.stringify(results));
 };
 run();
 

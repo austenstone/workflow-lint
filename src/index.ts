@@ -39,7 +39,7 @@ const run = async (): Promise<void> => {
           content: readFileSync(fileName, 'utf8')
         }, new NoOperationTraceWriter());
         result.context.errors.getErrors()?.forEach(err => {
-          const message = err.message.split(':');
+          const message = err.message.split(/\): /);
           error(
             message[1],
             {
@@ -59,7 +59,7 @@ const run = async (): Promise<void> => {
       }
     });
   });
-  setOutput('results', JSON.stringify(results))
+  // setOutput('results', JSON.stringify(results))
 };
 
 run();
