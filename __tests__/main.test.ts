@@ -9,8 +9,7 @@ const input: any = {
   'github-token': process.env.GITHUB_TOKEN,
   organization: process.env.ORGANIZATION || 'octoaustenstone',
   owner: process.env.OWNER || 'austenstone',
-  repo: process.env.REPO || 'workflow-lint',
-  files: process.env.WORKFLOW_PATH || '__tests__/workflow-invalid.yml',
+  repo: process.env.REPO || 'workflow-lint'
 }
 
 test('test run', () => {

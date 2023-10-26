@@ -20414,27 +20414,31 @@ const run = async () => {
             (0,fs__WEBPACK_IMPORTED_MODULE_2__.readdirSync)(WORKFLOW_DIR)
                 .filter(name => name.endsWith('.yml') || name.endsWith('.yaml'))
                 .map(name => (0,path__WEBPACK_IMPORTED_MODULE_3__.join)(WORKFLOW_DIR, name));
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.startGroup)(`Linting ${workflowFiles.length} workflow files`);
-    workflowFiles.forEach(name => console.log(name));
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.endGroup)();
-    if (workflowFiles.length === 0)
-        return (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)('No workflow files found');
-    const results = workflowFiles.map(name => (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.parseWorkflow)({
-        name,
-        content: (0,fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync)(name, 'utf8')
-    }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.NoOperationTraceWriter()));
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)('results', JSON.stringify(results));
-    results.forEach(result => {
-        const errors = result.context.errors.getErrors();
-        errors.forEach(err => (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.error)(err.message, {
-            endColumn: err.range?.end.column,
-            startColumn: err.range?.start.column,
-            endLine: err.range?.end.line,
-            startLine: err.range?.start.line,
-            file: result.context.getFileTable()[0],
-            title: err.message.split('at')[0].trim(),
-        }));
+    let results = [];
+    workflowFiles.forEach(fileName => {
+        (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.group)(`Linting ${fileName}`, async () => {
+            try {
+                const result = (0,_actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.parseWorkflow)({
+                    name: fileName,
+                    content: (0,fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync)(fileName, 'utf8')
+                }, new _actions_workflow_parser__WEBPACK_IMPORTED_MODULE_1__.NoOperationTraceWriter());
+                result.context.errors.getErrors()?.forEach(err => (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.error)(err.message, {
+                    endColumn: err.range?.end.column,
+                    startColumn: err.range?.start.column,
+                    endLine: err.range?.end.line,
+                    startLine: err.range?.start.line,
+                    file: result.context.getFileTable()[0],
+                    title: err.message.split('at')[0].trim(),
+                }));
+                results.push(result);
+            }
+            catch (err) {
+                (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(`Workflow ${fileName} failed to parse: ${(err instanceof Error) ? err.message : err}`);
+                return;
+            }
+        });
     });
+    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)('results', JSON.stringify(results));
 };
 run();
 
