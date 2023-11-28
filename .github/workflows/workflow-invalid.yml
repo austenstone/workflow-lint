@@ -30,7 +30,7 @@ jobs:
       - test: actions/setup-node@v6
       - run: npm install
       - run: npm run build
-      - uses: JamesIves/github-pages-deploy-action@3.5.14
+      - uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
         branch: gh-pages
         folder: build
