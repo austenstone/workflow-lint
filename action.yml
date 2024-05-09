@@ -1,6 +1,6 @@
-name: Workflow Lint
+name: GitHub Actions Workflow Lint
 author: Austen Stone
-description: Lint workflow files
+description: Lint GitHub Actions workflow yml files
 branding:
   icon: "search"
   color: "red"
